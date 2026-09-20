@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MarineAquaApp());
-}
+void main() => runApp(const MarineAquaApp());
 
 class MarineAquaApp extends StatelessWidget {
   const MarineAquaApp({super.key});
@@ -14,17 +12,17 @@ class MarineAquaApp extends StatelessWidget {
       title: 'MARINE AQUA TECHNOLOGIES',
       theme: ThemeData(
         useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFF4FAFB),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF007C91),
         ),
-        scaffoldBackgroundColor: const Color(0xFFF4FAFB),
       ),
       home: const LoginPage(),
     );
   }
 }
 
-// ---------------- LOGIN + DEMO OTP ----------------
+// ---------------- LOGIN ----------------
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,41 +32,37 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final mobileController = TextEditingController();
-  final otpController = TextEditingController();
+  final mobile = TextEditingController();
+  final otp = TextEditingController();
   bool otpMode = false;
 
   @override
   void dispose() {
-    mobileController.dispose();
-    otpController.dispose();
+    mobile.dispose();
+    otp.dispose();
     super.dispose();
   }
 
   void sendOtp() {
-    if (mobileController.text.trim().length != 10) {
-      _message('Enter a valid 10-digit mobile number');
+    if (mobile.text.trim().length != 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid 10-digit mobile number')),
+      );
       return;
     }
     setState(() => otpMode = true);
-    _message('Demo OTP screen opened');
   }
 
-  void verifyOtp() {
-    if (otpController.text.trim().length != 6) {
-      _message('Enter a 6-digit OTP');
+  void verify() {
+    if (otp.text.trim().length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a 6-digit OTP')),
+      );
       return;
     }
-
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const HomeShell()),
-    );
-  }
-
-  void _message(String text) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(text)),
     );
   }
 
@@ -86,17 +80,14 @@ class _LoginPageState extends State<LoginPage> {
                 const Text(
                   'MARINE AQUA TECHNOLOGIES',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 21,
-                    fontWeight: FontWeight.w900,
-                  ),
+                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 6),
                 const Text(
                   'Smart Aquaculture. Better Results.',
                   style: TextStyle(color: Color(0xFF607D85)),
                 ),
-                const SizedBox(height: 35),
+                const SizedBox(height: 30),
                 Card(
                   elevation: 0,
                   child: Padding(
@@ -116,13 +107,11 @@ class _LoginPageState extends State<LoginPage> {
                           otpMode
                               ? 'Enter the 6-digit OTP'
                               : 'Login with your mobile number',
-                          style: const TextStyle(
-                            color: Color(0xFF78909C),
-                          ),
+                          style: const TextStyle(color: Color(0xFF78909C)),
                         ),
-                        const SizedBox(height: 22),
+                        const SizedBox(height: 20),
                         TextField(
-                          controller: mobileController,
+                          controller: mobile,
                           enabled: !otpMode,
                           keyboardType: TextInputType.phone,
                           maxLength: 10,
@@ -137,9 +126,9 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         if (otpMode) ...[
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 12),
                           TextField(
-                            controller: otpController,
+                            controller: otp,
                             keyboardType: TextInputType.number,
                             maxLength: 6,
                             decoration: InputDecoration(
@@ -152,24 +141,15 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ],
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 15),
                         SizedBox(
                           width: double.infinity,
                           height: 52,
                           child: FilledButton(
-                            onPressed: otpMode ? verifyOtp : sendOtp,
-                            child: Text(
-                              otpMode ? 'VERIFY OTP' : 'SEND OTP',
-                            ),
+                            onPressed: otpMode ? verify : sendOtp,
+                            child: Text(otpMode ? 'VERIFY OTP' : 'SEND OTP'),
                           ),
                         ),
-                        if (otpMode)
-                          Center(
-                            child: TextButton(
-                              onPressed: sendOtp,
-                              child: const Text('Resend OTP'),
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -183,7 +163,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-// ---------------- HOME SHELL ----------------
+// ---------------- HOME ----------------
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -193,7 +173,7 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeShellState extends State<HomeShell> {
-  int selectedIndex = 0;
+  int index = 0;
 
   final pages = const [
     HomePage(),
@@ -206,12 +186,10 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[selectedIndex],
+      body: pages[index],
       bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() => selectedIndex = index);
-        },
+        selectedIndex: index,
+        onDestinationSelected: (value) => setState(() => index = value),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -243,8 +221,6 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 }
-
-// ---------------- HOME ----------------
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -301,10 +277,7 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.all(22),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF005B70),
-                    Color(0xFF00A6A6),
-                  ],
+                  colors: [Color(0xFF005B70), Color(0xFF00A6A6)],
                 ),
                 borderRadius: BorderRadius.circular(24),
               ),
@@ -332,10 +305,7 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: 10),
                   Text(
                     'Manage ponds, products and support in one place.',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                 ],
               ),
@@ -386,16 +356,8 @@ class HomePage extends StatelessWidget {
                 padding: EdgeInsets.all(18),
                 child: Row(
                   children: [
-                    StatItem(
-                      icon: Icons.water,
-                      value: '0',
-                      label: 'Ponds',
-                    ),
-                    StatItem(
-                      icon: Icons.science,
-                      value: '0',
-                      label: 'Tests',
-                    ),
+                    StatItem(icon: Icons.water, value: '0', label: 'Ponds'),
+                    StatItem(icon: Icons.science, value: '0', label: 'Tests'),
                     StatItem(
                       icon: Icons.analytics_outlined,
                       value: '0',
@@ -412,32 +374,113 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// ---------------- PRODUCTS ----------------
+// ---------------- PRODUCT DATA ----------------
+
+class ProductData {
+  final String name;
+  final String subtitle;
+  final String netWeight;
+  final String dosage;
+  final String composition;
+  final String technology;
+  final String use;
+
+  const ProductData({
+    required this.name,
+    required this.subtitle,
+    required this.netWeight,
+    required this.dosage,
+    required this.composition,
+    required this.technology,
+    required this.use,
+  });
+}
+
+const products = <ProductData>[
+  ProductData(
+    name: 'MARINE-6G',
+    subtitle: 'Liquid Minerals',
+    netWeight: '5 Ltr',
+    dosage: '2–3 Ltr per acre; in feed 10 ml/kg',
+    composition:
+        'Proprietary blend of bio-available macro minerals, chelated trace elements, stabilized ionic complexes, moulting support factors and mineral uptake enhancers.',
+    technology: 'Nano Ion Matrix Technology',
+    use: 'Supports mineral availability and moulting-related pond management.',
+  ),
+  ProductData(
+    name: 'MARINE WHITE SHIELD',
+    subtitle: 'Advanced Gut Health Formula',
+    netWeight: '1 Ltr',
+    dosage: 'Preventive: 5–10 ml/kg feed; Curative: 10 ml/kg feed',
+    composition:
+        'Multi-Strain Probiotic Complex, Gut Stabilizing Organic Acid Salts, Natural Phytogenic Extracts, Yeast Beta-Glucans, Digestive Enzyme Complex, Advanced Toxin Binder & Gut Protectant, Prebiotic Support (MOS & FOS), Mineral & Electro Stabilizers.',
+    technology: 'Advanced Gut Health Formula',
+    use: 'Formulated for gut-health support in shrimp culture.',
+  ),
+  ProductData(
+    name: 'MARINE VIBRIO SHIELD',
+    subtitle: 'Vibrio Management',
+    netWeight: '1 Ltr',
+    dosage: 'Preventive: 1 L/acre; Curative: 1.5 L/acre',
+    composition:
+        'Proprietary high-efficacy liquid formulation with controlled oxidative activators, marine-grade salts and advanced stabilizing agents.',
+    technology: 'Works Inside The Vibrio Cell',
+    use: 'Apply probiotics after 24 hours as stated on the product brochure.',
+  ),
+  ProductData(
+    name: 'MARINE PROTAB',
+    subtitle: 'Probiotic Tablet',
+    netWeight: '500 g',
+    dosage: '250–300 g/acre',
+    composition:
+        'Spore-Forming Marine Probiotic Blend, Nitrifying Bacteria Complex, Purple Non-Sulfur Bacteria, Lactic Acid Bacteria Shield, Yeast Culture Extract, enzyme system synbiotic & functional additives, MOS, beta glucan, seaweed polysaccharide extract, natural fermentable carbon source and mineral carrier base.',
+    technology: 'M-CRT',
+    use: 'Probiotic tablet for pond microbial support.',
+  ),
+  ProductData(
+    name: 'OXY TAB+',
+    subtitle: 'Oxygen Support',
+    netWeight: '1 kg / 2 kg / 10 kg',
+    dosage: '500 g/acre',
+    composition:
+        'Oxygen precursors, sodium perborate and sodium percarbonate with stabilizers.',
+    technology: 'Smart Oxygen Release Technology',
+    use: 'Oxygen support with the brochure stating an 8-hour release period.',
+  ),
+  ProductData(
+    name: 'MARINE VOLT-X',
+    subtitle: 'Advanced Growth Booster for Shrimp',
+    netWeight: 'Not specified in brochure',
+    dosage: 'Preventive: 5–10 ml/kg feed; Curative: 10 ml/kg feed',
+    composition:
+        'Energy Activator Complex, Stabilized Vitamin Blend, Essential Amino Acids, Hepatopancreas Support Extract, Electrolyte Balance System, Beta-Glucan Immune Support, Chelated Trace Minerals and Feed Assimilation Enhancer.',
+    technology: 'Probiotics & Enzymes',
+    use: 'Formulated for digestion, immunity and growth support.',
+  ),
+  ProductData(
+    name: 'BIO SLUDGE-X',
+    subtitle: 'Pond Bottom Management',
+    netWeight: '500 g',
+    dosage: '250–500 g/acre',
+    composition:
+        'High-density blend of beneficial Bacillus species, enzyme mix, Yucca extract, Thiobacillus spp, nitrifying bacteria, enzyme activation system and bottom activation carriers.',
+    technology: 'BioPond Clean Technology',
+    use: 'Designed for pond bottom and sludge management.',
+  ),
+  ProductData(
+    name: 'FREE MOULT',
+    subtitle: 'Moulting Support',
+    netWeight: '10 kg',
+    dosage: '5–10 kg/acre',
+    composition:
+        'Chelated minerals, moulting inducers, selenium, cobalt, iodine, enzymes and other listed formulation components.',
+    technology: 'Moulting Support Formula',
+    use: 'Formulated for moulting-related mineral support.',
+  ),
+];
 
 class ProductsPage extends StatelessWidget {
   const ProductsPage({super.key});
-
-  static const productNames = [
-    'MARINE-6G',
-    'MARINE WHITE SHIELD',
-    'MARINE VIBRIO SHIELD',
-    'MARINE PROTAB',
-    'OXY TAB+',
-    'MARINE VOLT-X',
-    'BIO SLUDGE-X',
-    'FREE MOULT',
-  ];
-
-  static const productSubtitles = [
-    'Liquid Minerals',
-    'Advanced Gut Health',
-    'Vibrio Management',
-    'Probiotic Tablet',
-    'Oxygen Support',
-    'Growth Booster',
-    'Pond Bottom Management',
-    'Moulting Support',
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -447,9 +490,10 @@ class ProductsPage extends StatelessWidget {
       child: ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: productNames.length,
+        itemCount: products.length,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
+          final product = products[index];
           return Card(
             elevation: 0,
             child: ListTile(
@@ -462,19 +506,16 @@ class ProductsPage extends StatelessWidget {
                 ),
               ),
               title: Text(
-                productNames[index],
+                product.name,
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
-              subtitle: Text(productSubtitles[index]),
+              subtitle: Text(product.subtitle),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ProductDetailsPage(
-                      name: productNames[index],
-                      subtitle: productSubtitles[index],
-                    ),
+                    builder: (_) => ProductDetailsPage(product: product),
                   ),
                 );
               },
@@ -487,43 +528,72 @@ class ProductsPage extends StatelessWidget {
 }
 
 class ProductDetailsPage extends StatelessWidget {
-  final String name;
-  final String subtitle;
+  final ProductData product;
 
-  const ProductDetailsPage({
-    required this.name,
-    required this.subtitle,
-    super.key,
-  });
+  const ProductDetailsPage({required this.product, super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppPage(
-      title: name,
-      subtitle: subtitle,
+      title: product.name,
+      subtitle: product.subtitle,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 210,
             width: double.infinity,
+            height: 235,
             decoration: BoxDecoration(
-              color: const Color(0xFFE7F7F8),
-              borderRadius: BorderRadius.circular(24),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFE6F8FA), Color(0xFFF5FCFD)],
+              ),
+              borderRadius: BorderRadius.circular(25),
             ),
-            child: const Icon(
-              Icons.inventory_2_outlined,
-              size: 85,
-              color: Color(0xFF007C91),
+            child: const Center(
+              child: Icon(
+                Icons.inventory_2_outlined,
+                size: 95,
+                color: Color(0xFF007C91),
+              ),
             ),
           ),
           const SizedBox(height: 16),
-          const Card(
-            child: Padding(
-              padding: EdgeInsets.all(18),
-              child: Text(
-                'Product photo and detailed information will be added here.',
-                style: TextStyle(height: 1.5),
+          InfoCard(
+            title: 'Product Overview',
+            child: Column(
+              children: [
+                DetailRow(label: 'Product', value: product.name),
+                DetailRow(label: 'Net Weight', value: product.netWeight),
+                DetailRow(label: 'Dosage', value: product.dosage),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          InfoCard(
+            title: 'Technology',
+            child: Text(
+              product.technology,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF007C91),
               ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          InfoCard(
+            title: 'Composition',
+            child: Text(
+              product.composition,
+              style: const TextStyle(height: 1.55),
+            ),
+          ),
+          const SizedBox(height: 12),
+          InfoCard(
+            title: 'Product Use',
+            child: Text(
+              product.use,
+              style: const TextStyle(height: 1.55),
             ),
           ),
         ],
@@ -532,7 +602,7 @@ class ProductDetailsPage extends StatelessWidget {
   }
 }
 
-// ---------------- PONDS ----------------
+// ---------------- OTHER SCREENS ----------------
 
 class PondsPage extends StatelessWidget {
   const PondsPage({super.key});
@@ -575,14 +645,10 @@ class PondsPage extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AddPondPage(),
-                  ),
-                );
-              },
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AddPondPage()),
+              ),
               icon: const Icon(Icons.add),
               label: const Text('ADD NEW POND'),
             ),
@@ -593,62 +659,54 @@ class PondsPage extends StatelessWidget {
   }
 }
 
-// ---------------- FORMS ----------------
-
 class AddPondPage extends StatelessWidget {
   const AddPondPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const SimpleFormPage(
-      title: 'Add New Pond',
-      subtitle: 'Create your pond profile',
-      fields: [
-        'Pond Name',
-        'Farmer Name',
-        'Village / Location',
-        'Pond Area (Acres)',
-      ],
-    );
-  }
+  Widget build(BuildContext context) => const SimpleFormPage(
+        title: 'Add New Pond',
+        subtitle: 'Create your pond profile',
+        fields: [
+          'Pond Name',
+          'Farmer Name',
+          'Village / Location',
+          'Pond Area (Acres)',
+        ],
+      );
 }
 
 class WaterTestPage extends StatelessWidget {
   const WaterTestPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const SimpleFormPage(
-      title: 'Water Test',
-      subtitle: 'Record water parameters',
-      fields: [
-        'Pond Name',
-        'pH',
-        'Salinity',
-        'Temperature',
-        'Dissolved Oxygen',
-      ],
-    );
-  }
+  Widget build(BuildContext context) => const SimpleFormPage(
+        title: 'Water Test',
+        subtitle: 'Record water parameters',
+        fields: [
+          'Pond Name',
+          'pH',
+          'Salinity',
+          'Temperature',
+          'Dissolved Oxygen',
+        ],
+      );
 }
 
 class PondDiaryPage extends StatelessWidget {
   const PondDiaryPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const SimpleFormPage(
-      title: 'Pond Diary',
-      subtitle: 'Record daily pond activity',
-      fields: [
-        'Pond Name',
-        'Date',
-        'Feed Details',
-        'Pond Observation',
-        'Remarks',
-      ],
-    );
-  }
+  Widget build(BuildContext context) => const SimpleFormPage(
+        title: 'Pond Diary',
+        subtitle: 'Record daily pond activity',
+        fields: [
+          'Pond Name',
+          'Date',
+          'Feed Details',
+          'Pond Observation',
+          'Remarks',
+        ],
+      );
 }
 
 class SimpleFormPage extends StatelessWidget {
@@ -688,9 +746,7 @@ class SimpleFormPage extends StatelessWidget {
             width: double.infinity,
             height: 50,
             child: FilledButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               child: const Text('SAVE'),
             ),
           ),
@@ -704,168 +760,118 @@ class ReportsPage extends StatelessWidget {
   const ReportsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const AppPage(
-      title: 'Reports',
-      subtitle: 'Pond activity summary',
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.all(28),
-          child: Column(
-            children: [
-              Icon(
-                Icons.analytics_outlined,
-                size: 60,
-                color: Color(0xFF007C91),
-              ),
-              SizedBox(height: 12),
-              Text(
-                'No reports yet',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
+  Widget build(BuildContext context) => const AppPage(
+        title: 'Reports',
+        subtitle: 'Pond activity summary',
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(28),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.analytics_outlined,
+                  size: 60,
+                  color: Color(0xFF007C91),
                 ),
-              ),
-              SizedBox(height: 6),
-              Text(
-                'Reports will appear after pond data is recorded.',
-                textAlign: TextAlign.center,
-              ),
-            ],
+                SizedBox(height: 12),
+                Text(
+                  'No reports yet',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  'Reports will appear after pond data is recorded.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }
-
-// ---------------- SUPPORT ----------------
 
 class SupportPage extends StatelessWidget {
   const SupportPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const AppPage(
-      title: 'Technical Support',
-      subtitle: 'Connect with the Marine Aqua team',
-      child: Column(
-        children: [
-          InfoTile(
-            icon: Icons.call_outlined,
-            title: 'Customer Care',
-            value: '+91 93902 59830',
-          ),
-          SizedBox(height: 10),
-          InfoTile(
-            icon: Icons.email_outlined,
-            title: 'Email',
-            value: 'marineaquahr@gmail.com',
-          ),
-          SizedBox(height: 10),
-          InfoTile(
-            icon: Icons.location_on_outlined,
-            title: 'Corporate Office',
-            value: 'Madhapur, Hyderabad',
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const AppPage(
+        title: 'Technical Support',
+        subtitle: 'Connect with the Marine Aqua team',
+        child: Column(
+          children: [
+            InfoTile(
+              icon: Icons.call_outlined,
+              title: 'Customer Care',
+              value: '+91 93902 59830',
+            ),
+            SizedBox(height: 10),
+            InfoTile(
+              icon: Icons.email_outlined,
+              title: 'Email',
+              value: 'marineaquahr@gmail.com',
+            ),
+            SizedBox(height: 10),
+            InfoTile(
+              icon: Icons.location_on_outlined,
+              title: 'Corporate Office',
+              value: 'Madhapur, Hyderabad',
+            ),
+          ],
+        ),
+      );
 }
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const AppPage(
-      title: 'Notifications',
-      subtitle: 'Latest updates',
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.all(25),
-          child: Center(
-            child: Text('No new notifications'),
+  Widget build(BuildContext context) => const AppPage(
+        title: 'Notifications',
+        subtitle: 'Latest updates',
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(25),
+            child: Center(child: Text('No new notifications')),
           ),
         ),
-      ),
-    );
-  }
+      );
 }
-
-// ---------------- PROFILE ----------------
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return AppPage(
-      title: 'Profile',
-      subtitle: 'Your Marine Aqua account',
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF005B70),
-                  Color(0xFF00A6A6),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(22),
+  Widget build(BuildContext context) => const AppPage(
+        title: 'Profile',
+        subtitle: 'Your Marine Aqua account',
+        child: Column(
+          children: [
+            InfoTile(
+              icon: Icons.notifications_none,
+              title: 'Notifications',
+              value: 'App notifications',
             ),
-            child: const Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.white24,
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 32,
-                  ),
-                ),
-                SizedBox(width: 15),
-                Text(
-                  'Farmer Account',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
+            SizedBox(height: 10),
+            InfoTile(
+              icon: Icons.help_outline,
+              title: 'Help & Support',
+              value: 'Get technical support',
             ),
-          ),
-          const SizedBox(height: 15),
-          const InfoTile(
-            icon: Icons.notifications_none,
-            title: 'Notifications',
-            value: 'App notifications',
-          ),
-          const SizedBox(height: 10),
-          const InfoTile(
-            icon: Icons.help_outline,
-            title: 'Help & Support',
-            value: 'Get technical support',
-          ),
-          const SizedBox(height: 10),
-          const InfoTile(
-            icon: Icons.info_outline,
-            title: 'About',
-            value: 'MARINE AQUA TECHNOLOGIES',
-          ),
-        ],
-      ),
-    );
-  }
+            SizedBox(height: 10),
+            InfoTile(
+              icon: Icons.info_outline,
+              title: 'About',
+              value: 'MARINE AQUA TECHNOLOGIES',
+            ),
+          ],
+        ),
+      );
 }
 
-// ---------------- SHARED UI ----------------
+// ---------------- SHARED ----------------
 
 class AppPage extends StatelessWidget {
   final String title;
@@ -923,13 +929,84 @@ class AppPage extends StatelessWidget {
   }
 }
 
+class InfoCard extends StatelessWidget {
+  final String title;
+  final Widget child;
+
+  const InfoCard({
+    required this.title,
+    required this.child,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 13),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const DetailRow({
+    required this.label,
+    required this.value,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 105,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFF78909C),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class BrandMark extends StatelessWidget {
   final double size;
 
-  const BrandMark({
-    required this.size,
-    super.key,
-  });
+  const BrandMark({required this.size, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -938,17 +1015,14 @@ class BrandMark extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF005B70),
-            Color(0xFF00A6A6),
-          ],
+          colors: [Color(0xFF005B70), Color(0xFF00A6A6)],
         ),
-        borderRadius: BorderRadius.circular(size * 0.28),
+        borderRadius: BorderRadius.circular(size * .28),
       ),
       child: Icon(
         Icons.waves,
         color: Colors.white,
-        size: size * 0.52,
+        size: size * .52,
       ),
     );
   }
@@ -960,15 +1034,10 @@ class SectionTitle extends StatelessWidget {
   const SectionTitle(this.text, {super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 19,
-        fontWeight: FontWeight.w800,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Text(
+        text,
+        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800),
+      );
 }
 
 class ActionCard extends StatelessWidget {
@@ -998,16 +1067,9 @@ class ActionCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                color: const Color(0xFF007C91),
-                size: 28,
-              ),
+              Icon(icon, color: const Color(0xFF007C91), size: 28),
               const SizedBox(height: 9),
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w800),
-              ),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
               const SizedBox(height: 3),
               Text(
                 subtitle,
@@ -1037,33 +1099,28 @@ class StatItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: const Color(0xFF008B91),
-          ),
-          const SizedBox(height: 7),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
+  Widget build(BuildContext context) => Expanded(
+        child: Column(
+          children: [
+            Icon(icon, color: const Color(0xFF008B91)),
+            const SizedBox(height: 7),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              color: Color(0xFF78909C),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                color: Color(0xFF78909C),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 }
 
 class InfoTile extends StatelessWidget {
@@ -1079,23 +1136,15 @@ class InfoTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: const Color(0xFFE7F7F8),
-          child: Icon(
-            icon,
-            color: const Color(0xFF007C91),
+  Widget build(BuildContext context) => Card(
+        elevation: 0,
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: const Color(0xFFE7F7F8),
+            child: Icon(icon, color: const Color(0xFF007C91)),
           ),
+          title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+          subtitle: Text(value),
         ),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w800),
-        ),
-        subtitle: Text(value),
-      ),
-    );
-  }
+      );
 }
