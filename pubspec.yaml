@@ -1,5 +1,6 @@
+
 name: marine_aqua_technologies
-description: MARINE AQUA TECHNOLOGIES mobile application
+description: Marine Aqua Technologies mobile app
 publish_to: "none"
 version: 1.0.0+1
 
@@ -10,10 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
-
 flutter:
   uses-material-design: true
+  assets:
+    - assets/marine_6g.png
